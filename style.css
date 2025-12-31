@@ -1,0 +1,85 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+}
+
+/* APP */
+.app {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* TEXT */
+.content {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  color: white;
+  animation: fadeIn 2s ease-in-out;
+}
+
+/* ✨ NEON TEXT */
+.neon {
+  font-size: 2.6rem;
+  color: #fff;
+  text-shadow:
+    0 0 5px #00ffff,
+    0 0 10px #00ffff,
+    0 0 20px #00ffff,
+    0 0 40px #00ffff;
+  animation: glow 2s infinite alternate;
+}
+p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+}
+@keyframes glow {
+  from {
+    text-shadow:
+      0 0 5px #ff00ff,
+      0 0 10px #ff00ff,
+      0 0 20px #ff00ff;
+  }
+  to {
+    text-shadow:
+      0 0 10px #00ffff,
+      0 0 25px #00ffff,
+      0 0 50px #00ffff;
+  }
+}
+
+.content p {
+  margin-top: 12px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* CANVAS */
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* FADE */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
