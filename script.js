@@ -3,11 +3,11 @@ const ctx = canvas.getContext("2d");
 const sound = document.getElementById("fireSound");
 
 let audioUnlocked = false;
-const isMobile = window.innerWidth < 768; // detect mobile/tablet
-const PARTICLE_COUNT = isMobile ? 20 : 50; // fewer particles on mobile
+const isMobile = window.innerWidth < 768; // mobile detection
+const PARTICLE_COUNT = isMobile ? 20 : 35;
 const SPEED_MULTIPLIER = isMobile ? 1.5 : 1;
 
-// 🔊 Unlock audio
+// Unlock audio
 function unlockAudio() {
   if (!audioUnlocked) {
     sound.muted = false;
@@ -24,15 +24,44 @@ function resize() {
 resize();
 window.addEventListener("resize", resize);
 
+// Particle class for 2D fireworks
+class Particle {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.radius = Math.random() * 2 + 1;
+    this.color = color;
+    this.angle = Math.random() * Math.PI * 2;
+    this.speed = Math.random() * 5 * SPEED_MULTIPLIER;
+    this.life = 60;
+    this.gravity = 0.05;
+  }
+
+  update() {
+    this.x += Math.cos(this.angle) * this.speed;
+    this.y += Math.sin(this.angle) * this.speed + this.gravity;
+    this.speed *= 0.95; // slow down gradually
+    this.life--;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.shadowBlur = 10; // neon glow
+    ctx.shadowColor = this.color;
+    ctx.fill();
+  }
+}
+
 // Firework class
 class Firework {
   constructor() {
     this.x = Math.random() * canvas.width;
     this.y = canvas.height;
-    this.z = Math.random() * 2 + 0.5;
     this.targetY = Math.random() * canvas.height * 0.4;
-    this.color = `hsl(${Math.random() * 360},100%,60%)`;
-    this.speed = (Math.random() * 3 + 5) * this.z * SPEED_MULTIPLIER;
+    this.speed = (Math.random() * 5 + 6) * SPEED_MULTIPLIER;
+    this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
     this.exploded = false;
     this.particles = [];
   }
@@ -40,14 +69,7 @@ class Firework {
   explode() {
     if (audioUnlocked) sound.cloneNode().play();
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      this.particles.push({
-        x: this.x,
-        y: this.y,
-        z: this.z,
-        angle: Math.random() * Math.PI * 2,
-        speed: Math.random() * 6 * this.z,
-        life: 60
-      });
+      this.particles.push(new Particle(this.x, this.y, this.color));
     }
   }
 
@@ -59,28 +81,21 @@ class Firework {
         this.explode();
       }
     } else {
-      this.particles.forEach(p => {
-        p.x += Math.cos(p.angle) * p.speed;
-        p.y += Math.sin(p.angle) * p.speed;
-        p.life--;
-      });
+      this.particles.forEach(p => p.update());
     }
   }
 
   draw() {
     if (!this.exploded) {
       ctx.beginPath();
-      ctx.arc(this.x, this.y, 2 * this.z, 0, Math.PI * 2);
+      ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = this.color;
       ctx.fill();
     } else {
       this.particles.forEach(p => {
-        if (p.life > 0) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 2 * p.z, 0, Math.PI * 2);
-          ctx.fillStyle = this.color;
-          ctx.fill();
-        }
+        if (p.life > 0) p.draw();
       });
     }
   }
@@ -90,9 +105,13 @@ class Firework {
 let fireworks = [];
 
 function animate() {
-  // lighter trail for faster rendering
-  ctx.fillStyle = "rgba(0,0,0,0.2)";
+  // Solid background (black)
+  ctx.fillStyle = "#000000"; // or any color you like
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Optional: draw fireworks trails
+  // ctx.fillStyle = "rgba(0,0,0,0.25)";
+  // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (Math.random() < 0.08) fireworks.push(new Firework());
 
@@ -106,5 +125,6 @@ function animate() {
 
   requestAnimationFrame(animate);
 }
+
 
 animate();

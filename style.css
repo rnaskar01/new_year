@@ -20,11 +20,23 @@ body {
   position: relative;
 }
 
+/* Content wrapper for proper centering */
+.content-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+}
+
 /* TEXT */
 .content {
   position: relative;
   z-index: 3;
-  text-align: center;
   color: white;
   animation: fadeIn 2s ease-in-out;
 }
@@ -40,10 +52,40 @@ body {
     0 0 40px #00ffff;
   animation: glow 2s infinite alternate;
 }
+
 p {
   font-size: 1.2rem;
   margin-bottom: 25px;
 }
+
+.content p {
+  margin-top: 12px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* CANVAS */
+canvas {
+  position: fixed; /* fixed for smoother redraw on mobile */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* FADE */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes glow {
   from {
     text-shadow:
@@ -59,31 +101,7 @@ p {
   }
 }
 
-.content p {
-  margin-top: 12px;
-  font-size: 1.1rem;
-  opacity: 0.9;
-}
-
-/* CANVAS */
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-/* FADE */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* MOBILE OPTIMIZATION */
 @media (max-width: 768px) {
   .neon {
     font-size: 1.8rem; /* smaller text for phones */
@@ -96,4 +114,3 @@ canvas {
     font-size: 1rem;
   }
 }
-
