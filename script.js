@@ -3,9 +3,9 @@ const ctx = canvas.getContext("2d");
 const sound = document.getElementById("fireSound");
 
 let audioUnlocked = false;
-const isMobile = window.innerWidth < 500; // detect mobile
-const PARTICLE_COUNT = isMobile ? 25 : 50; // reduce particles on mobile
-const SPEED_MULTIPLIER = isMobile ? 1.2 : 1;
+const isMobile = window.innerWidth < 768; // detect mobile/tablet
+const PARTICLE_COUNT = isMobile ? 20 : 50; // fewer particles on mobile
+const SPEED_MULTIPLIER = isMobile ? 1.5 : 1;
 
 // 🔊 Unlock audio
 function unlockAudio() {
@@ -16,12 +16,10 @@ function unlockAudio() {
   }
 }
 
-// Resize canvas and scale for devicePixelRatio
+// Resize canvas
 function resize() {
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = window.innerWidth * dpr;
-  canvas.height = window.innerHeight * dpr;
-  ctx.scale(dpr, dpr);
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
 resize();
 window.addEventListener("resize", resize);
@@ -29,12 +27,12 @@ window.addEventListener("resize", resize);
 // Firework class
 class Firework {
   constructor() {
-    this.x = Math.random() * canvas.width / (window.devicePixelRatio || 1);
-    this.y = canvas.height / (window.devicePixelRatio || 1);
-    this.z = Math.random() * 2 + 0.5; // depth
-    this.targetY = Math.random() * canvas.height * 0.4 / (window.devicePixelRatio || 1);
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height;
+    this.z = Math.random() * 2 + 0.5;
+    this.targetY = Math.random() * canvas.height * 0.4;
     this.color = `hsl(${Math.random() * 360},100%,60%)`;
-    this.speed = (Math.random() * 3 + 4) * this.z * SPEED_MULTIPLIER;
+    this.speed = (Math.random() * 3 + 5) * this.z * SPEED_MULTIPLIER;
     this.exploded = false;
     this.particles = [];
   }
@@ -47,8 +45,8 @@ class Firework {
         y: this.y,
         z: this.z,
         angle: Math.random() * Math.PI * 2,
-        speed: Math.random() * 5 * this.z,
-        life: 70
+        speed: Math.random() * 6 * this.z,
+        life: 60
       });
     }
   }
@@ -92,10 +90,11 @@ class Firework {
 let fireworks = [];
 
 function animate() {
-  ctx.fillStyle = "rgba(0,0,0,0.25)";
-  ctx.fillRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
+  // lighter trail for faster rendering
+  ctx.fillStyle = "rgba(0,0,0,0.2)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  if (Math.random() < 0.06) fireworks.push(new Firework());
+  if (Math.random() < 0.08) fireworks.push(new Firework());
 
   fireworks.forEach((f, i) => {
     f.update();

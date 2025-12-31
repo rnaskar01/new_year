@@ -83,3 +83,17 @@ canvas {
     transform: translateY(0);
   }
 }
+
+@media (max-width: 768px) {
+  .neon {
+    font-size: 1.8rem; /* smaller text for phones */
+    text-shadow:
+      0 0 5px #0ff,
+      0 0 15px #0ff;
+  }
+
+  .content p {
+    font-size: 1rem;
+  }
+}
+
