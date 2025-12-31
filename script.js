@@ -3,8 +3,11 @@ const ctx = canvas.getContext("2d");
 const sound = document.getElementById("fireSound");
 
 let audioUnlocked = false;
+const isMobile = window.innerWidth < 500; // detect mobile
+const PARTICLE_COUNT = isMobile ? 25 : 50; // reduce particles on mobile
+const SPEED_MULTIPLIER = isMobile ? 1.2 : 1;
 
-/* 🔊 UNLOCK AUDIO */
+// 🔊 Unlock audio
 function unlockAudio() {
   if (!audioUnlocked) {
     sound.muted = false;
@@ -13,30 +16,32 @@ function unlockAudio() {
   }
 }
 
-/* CANVAS */
+// Resize canvas and scale for devicePixelRatio
 function resize() {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  ctx.scale(dpr, dpr);
 }
 resize();
-addEventListener("resize", resize);
+window.addEventListener("resize", resize);
 
-/* 🎆 3D FIREWORK */
+// Firework class
 class Firework {
   constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = canvas.height;
-    this.z = Math.random() * 2 + 0.5; // DEPTH
-    this.targetY = Math.random() * canvas.height * 0.4;
+    this.x = Math.random() * canvas.width / (window.devicePixelRatio || 1);
+    this.y = canvas.height / (window.devicePixelRatio || 1);
+    this.z = Math.random() * 2 + 0.5; // depth
+    this.targetY = Math.random() * canvas.height * 0.4 / (window.devicePixelRatio || 1);
     this.color = `hsl(${Math.random() * 360},100%,60%)`;
-    this.speed = (Math.random() * 3 + 4) * this.z;
+    this.speed = (Math.random() * 3 + 4) * this.z * SPEED_MULTIPLIER;
     this.exploded = false;
     this.particles = [];
   }
 
   explode() {
     if (audioUnlocked) sound.cloneNode().play();
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
       this.particles.push({
         x: this.x,
         y: this.y,
@@ -72,21 +77,23 @@ class Firework {
       ctx.fill();
     } else {
       this.particles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 2 * p.z, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        if (p.life > 0) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 2 * p.z, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
       });
     }
   }
 }
 
-/* LOOP */
+// Animation loop
 let fireworks = [];
 
 function animate() {
   ctx.fillStyle = "rgba(0,0,0,0.25)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
 
   if (Math.random() < 0.06) fireworks.push(new Firework());
 
